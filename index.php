@@ -1,22 +1,16 @@
 <?php
 
+require_once __DIR__ . '/vendor/autoload.php';
 
-include 'MyCrawler.php';
-include 'MyStore.php';
-
-use Crwlr\Crawler\Steps;
+use Crawler\MyCrawler;
 use Crwlr\Crawler\Steps\Dom;
 use Crwlr\Crawler\Steps\Html;
 use Crwlr\Crawler\Steps\Loading\Http;
+use Crwlr\Crawler\Stores\SimpleCsvFileStore;
 
-$storeDirectory = './Store';
-$filename = 'alo.bg.csv';
-
-$crawler = new MyCrawler();
-$crawler->setStore(new MyStore($storeDirectory, $filename));
-
-
-$crawler->input('https://www.alo.bg/obiavi/avto-moto/avtomobili-djipove-pikapi/')
+(new MyCrawler())
+    ->setStore(new SimpleCsvFileStore('./store', 'alo.bg'))
+    ->input('https://www.alo.bg/obiavi/avto-moto/avtomobili-djipove-pikapi/')
     ->addStep(Http::get()->maxOutputs(1))
     ->addStep(
         Html::each('#content_container > [id^="adrows_"]')
@@ -28,16 +22,3 @@ $crawler->input('https://www.alo.bg/obiavi/avto-moto/avtomobili-djipove-pikapi/'
             ->addToResult()
     )
     ->runAndTraverse();
-
-
-/*
-foreach ($crawler->run() as $result) {
-
-    $title = $result->get('title');
-    echo $title."\n";
-    $url = $result->get('url');
-    echo $url."\n";
-    $par = $result->get('p');
-    echo  $par."\n";
-}
-*/
