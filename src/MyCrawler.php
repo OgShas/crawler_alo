@@ -45,7 +45,7 @@ class MyCrawler extends HttpCrawler
 
         $loader
             ->throttle()
-            ->waitBetween(new MultipleOf(2.0), new MultipleOf(4.0))
+            ->waitBetween(new MultipleOf(10.0), new MultipleOf(15.0))
         ;
 
         return $loader;

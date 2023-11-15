@@ -11,9 +11,12 @@ use Crwlr\Crawler\Stores\SimpleCsvFileStore;
 (new MyCrawler())
     ->setStore(new SimpleCsvFileStore('./store', 'alo.bg'))
     ->input('https://www.alo.bg/obiavi/avto-moto/avtomobili-djipove-pikapi/')
-    ->addStep(Http::get()->maxOutputs(1))
     ->addStep(
-        Html::each('#content_container > [id^="adrows_"]')
+        Http::get()
+            ->paginate('.paginator_wrapper', 10)
+    )
+    ->addStep(
+        Html::each('[id^="adrows_"]')
             ->extract([
                 'title' => 'h3',
                 'url' => Dom::cssSelector('a')->first()->link(),
