@@ -1,0 +1,45 @@
+{
+    "name": "crwlr/utils",
+    "description": "Utilities that are needed in multiple crawler packages.",
+    "keywords": [
+        "crwlr", "utils", "json"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Christian Olear",
+            "homepage": "https://www.otsch.codes",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/crwlrsoft/utils/issues",
+        "source": "https://github.com/crwlrsoft/utils"
+    },
+    "autoload": {
+        "psr-4": {
+            "Crwlr\\Utils\\": "src/"
+        }
+    },
+    "require": {
+        "php": "^8.0"
+    },
+    "require-dev": {
+        "pestphp/pest": "^1.22",
+        "phpstan/phpstan": "^1.8",
+        "friendsofphp/php-cs-fixer": "^3.11"
+    },
+    "scripts": {
+        "test": "@php vendor/bin/pest",
+        "cs": "@php vendor/bin/php-cs-fixer fix -v --dry-run",
+        "cs-fix": "@php vendor/bin/php-cs-fixer fix -v",
+        "stan": "@php vendor/bin/phpstan analyse -c phpstan.neon",
+        "add-git-hooks": "@php bin/add-git-hooks"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
