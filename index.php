@@ -17,15 +17,20 @@ use Crwlr\Crawler\Stores\SimpleCsvFileStore;
             ->paginate('.paginator_wrapper', 1)
     )
     ->addStep(
-        Html::root()
+        Html::each('[id^="adrows_"]')
             ->extract([
-                'title' => '[id^="adrows_"] h3',
-                'url' => Dom::cssSelector('[id^="adrows_"] a[href^="/"]')->link(),
-               //'p' => Dom::cssSelector('p')->first()->innerText(),
-                'price' => '.nowrap',
+                'title' => Dom::cssSelector('h3')->first(),
+                'url' => Dom::cssSelector('a')->first()->link(),
+                'price' => Dom::cssSelector('.nowrap')->first(),
+//                'p' => Dom::cssSelector('p')->first()->innerText(),
             ])
-           ->refineOutput('price',fn($output) => str_replace('лв','fostata',$output))
-             // ->refineOutput('price', \Crwlr\Crawler\Steps\Refiners\StringRefiner::replace('лв.','fostata'))
+            ->refineOutput('price', function (mixed $output) {
+
+                $output = str_replace(html_entity_decode('&nbsp;',ENT_COMPAT,''),' ',$output);
+                $output = str_replace(['лв','.',' '], '',$output);
+
+                return $output;
+            })
             ->addToResult()
 
     )
