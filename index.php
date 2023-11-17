@@ -12,6 +12,7 @@ use Crwlr\Crawler\Stores\SimpleCsvFileStore;
 (new MyCrawler())
     ->setStore(new SimpleCsvFileStore('./store', 'alo.bg'))
     ->input('https://www.alo.bg/obiavi/avto-moto/avtomobili-djipove-pikapi/')
+
     ->addStep(
         Http::get()
             ->paginate('.paginator_wrapper', 1)
@@ -27,9 +28,9 @@ use Crwlr\Crawler\Stores\SimpleCsvFileStore;
             ->refineOutput('price', function (mixed $output) {
 
                 $output = str_replace(html_entity_decode('&nbsp;',ENT_COMPAT,''),' ',$output);
-                $output = str_replace(['лв','.',' '], '',$output);
+                $output = str_replace(['лв.',' '], '',$output);
 
-                return $output;
+                return (float) $output;
             })
             ->addToResult()
 
