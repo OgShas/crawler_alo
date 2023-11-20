@@ -43,7 +43,7 @@ use Crwlr\Crawler\Stores\SimpleCsvFileStore;
 
 (new MyCrawler())
     ->setStore(new SimpleCsvFileStore('./store-Custom', 'alo.bg'))
-    ->input('https://www.alo.bg/obiavi/uslugi/')
+    ->input('https://www.alo.bg/obiavi/elektronika/')
     ->addStep(
         Http::get()
            // ->paginate('.paginator_wrapper', 1)
@@ -61,10 +61,17 @@ use Crwlr\Crawler\Stores\SimpleCsvFileStore;
         Html::each('[id^="adrows_"]')
             ->extract([
                 'title' => Dom::cssSelector('h3')->first(),
-               // 'url' => Dom::cssSelector('a')->first()->link(),
-                //'price' => Dom::cssSelector('.nowrap')->first(),
-                // 'p' => Dom::cssSelector('p')->first()->innerText(),
+                'url' => Dom::cssSelector('a')->first()->link(),
+                'price' => Dom::cssSelector('.nowrap')->first(),
+                 'p' => Dom::cssSelector('p')->first()->innerText(),
             ])
+            ->refineOutput('price', function (mixed $output) {
+
+                $output = str_replace(html_entity_decode('&nbsp;',ENT_COMPAT,''),' ',$output);
+                $output = str_replace(['лв.',' '], '',$output);
+
+                return (float) $output;
+            })
             ->addToResult()
     )
     ->runAndTraverse();
