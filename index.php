@@ -46,13 +46,12 @@ use Crwlr\Crawler\Stores\SimpleCsvFileStore;
     ->input('https://www.alo.bg/obiavi/elektronika/')
     ->addStep(
         Http::get()
-           // ->paginate('.paginator_wrapper', 1)
     )
     ->addStep(Html::each('#categorymenu .main')
         ->extract([
-            'title' => Dom::cssSelector('a')->first()->innerText(),
+            'menuItem' => Dom::cssSelector('a')->first()->innerText(),
             'url' => Dom::cssSelector('a')->first()->link()
-        ])
+        ])->addLaterToResult('menuItem')
     )->input('url')
     ->addStep(
         Http::get()
@@ -63,7 +62,7 @@ use Crwlr\Crawler\Stores\SimpleCsvFileStore;
                 'title' => Dom::cssSelector('h3')->first(),
                 'url' => Dom::cssSelector('a')->first()->link(),
                 'price' => Dom::cssSelector('.nowrap')->first(),
-                 'p' => Dom::cssSelector('p')->first()->innerText(),
+                 'description' => Dom::cssSelector('p')->first()->innerText(),
             ])
             ->refineOutput('price', function (mixed $output) {
 
