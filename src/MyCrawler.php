@@ -9,7 +9,9 @@ use Crwlr\Crawler\Loader\Http\Politeness\TimingUnits\MultipleOf;
 use Crwlr\Crawler\Loader\LoaderInterface;
 use Crwlr\Crawler\UserAgents\BotUserAgent;
 use Crwlr\Crawler\UserAgents\UserAgentInterface;
+use Generator;
 use Psr\Log\LoggerInterface;
+use Crwlr\Crawler\Steps\Step;
 
 class MyCrawler extends HttpCrawler
 {
