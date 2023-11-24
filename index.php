@@ -30,7 +30,7 @@ $customStep = new MyStep();
         ->extract([
             //'menuItem' => Dom::cssSelector('a')->first()->innerText(),
             'url' => Dom::cssSelector('a')->first()->link()
-        ])->addLaterToResult('menuItem ')
+        ])//addLaterToResult('menuItem ')
     )
     //Step 2 - take menu/2 list item (debth/2)
     ->addStep(
@@ -41,19 +41,25 @@ $customStep = new MyStep();
     ->addStep(
         Html::each('#categorymenu .main')
             ->extract([
-               // 'MenuDebth'  => Dom::cssSelector('a')->first()->innerText(),
+               'MenuName'  => Dom::cssSelector('a')->first()->innerText(),
                 'urlDebth' => Dom::cssSelector('a')->first()->link(),
             ])->addToResult()
-    ) //-> show result debth-2  //  -> Get all links
-
-
+    )//->runAndTraverse(); //-> show result debth-2  //  -> Get all links
 
     ->addStep(
          Http::get()
              ->useInputKey('urlDebth')
               )
-        ->addStep($customStep->addToResult())->runAndTraverse();
-    /*
+        ->addStep($customStep->addToResult()
+        )->runAndTraverse();
+
+
+            /*
+        )->input('urlDebth')
+
+    ->addStep(
+        Http::get()
+    )
     ->addStep(
         Html::each('#categorymenu .main')
             ->extract([
@@ -83,5 +89,6 @@ $customStep = new MyStep();
             ->addToResult()
     )
     ->runAndTraverse();
+
 
 */

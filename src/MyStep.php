@@ -1,6 +1,7 @@
 <?php
 
 use Crwlr\Crawler\Loader\Http\Messages\RespondedRequest;
+use Crwlr\Crawler\Steps\Dom;
 use Crwlr\Crawler\Steps\Loading\Http;
 use Crwlr\Crawler\Steps\Step;
 use Psr\Http\Message\ResponseInterface;
@@ -39,70 +40,37 @@ class MyStep extends Step
         $crawler = $this->validateAndSanitizeInput($input);
 
         if ($crawler instanceof Crawler) {
+
+            // Extract the menu items and links
             if ($crawler->filter('#categorymenu')->count() > 0) {
-
-                $mainNames = $crawler->filter('.main')->each(function (Crawler $main) {
-                    return $main->text();
+                $menuData = $crawler->filter('#categorymenu .main')->each(function (Crawler $category) {
+                    $link = $category->filter('a')->first()->link();
+                    return [
+                        'MenuDebth' => $category->filter('a')->first()->text(),
+                        'urlDebth' => $link->getUri(),
+                    ];
                 });
 
-                yield $mainNames;
-            } else if ($crawler->filter('#svgmap')->count() > 0) {
-                $regionTitles = $crawler->filter('.svgpath')->each(function (Crawler $region) {
-                    return $region->text();
+                    yield $menuData;
+            }
+
+            // Extract the map-city-link
+             if ($crawler->filter('#svgmap')->count() > 0) {
+                $regionData = $crawler->filter('#svgmap [id^="title_"]')->each(function (Crawler $region) {
+
+                    return [
+                        'text' => $region->filter('title')->first()->text(),
+
+                    ];
                 });
 
-                yield $regionTitles;
-            } else {
+                    yield $regionData;
+            }
 
+            else {
                 $url = $crawler->getUri();
-                yield $url;
+                yield (string)$url;
             }
         }
     }
 }
-
-
-
-            /*
-
-            $contentContainer = $crawler->filter('.right-listing');
-            $categoryMenu = $crawler->filter('#categorymenu');
-
-            if ($categoryMenu->count() > 0)
-            {
-                $menuLink = $categoryMenu->filter('.main');
-
-                foreach ($menuLink as $menuLinks)
-                {
-                    $linksMenu = new Crawler($menuLinks);
-                    yield $linksMenu->innerText();
-                }
-
-            }
-
-            else if ($contentContainer->count() > 0)
-                {
-                $svgMapElement = $contentContainer->filter('.result-count ');
-
-                if ($svgMapElement->count() > 0) {
-                    $svgPathElements = $crawler->filter('.h1');
-
-                    foreach ($svgPathElements as $svgPathElement) {
-                        $svgPathCrawler = new Crawler($svgPathElement);
-                          yield $svgPathCrawler->innerText();
-                       // yield $svgPathCrawler->link();
-                    }
-                } else {
-                    // #svgmap not found, return the URL
-                    $url = $crawler->getUri();
-                    $typeOfUrl = gettype($url);
-                    echo $typeOfUrl;
-                    yield (string)$url;
-                }
-            }
-        }
-    }
-}
-
-
-*/
