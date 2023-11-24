@@ -56,16 +56,27 @@ class MyStep extends Step
 
             // Extract the map-city-link
              if ($crawler->filter('#svgmap')->count() > 0) {
+                 /*
                 $regionData = $crawler->filter('#svgmap [id^="title_"]')->each(function (Crawler $region) {
-
+                    //$link = $region->filter('a')->first()->link();
                     return [
                         'text' => $region->filter('title')->first()->text(),
-
                     ];
                 });
-
                     yield $regionData;
             }
+                 */
+
+                 //Working Fine
+                 $regionData = $crawler->filter('.grid .grid-item')->each(function (Crawler $region) {
+
+                     return [
+                         'text' => $region->filter('a')->first()->text(),
+                     ];
+                 });
+                 yield $regionData;
+             }
+
 
             else {
                 $url = $crawler->getUri();
