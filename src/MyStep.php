@@ -8,80 +8,71 @@ use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DomCrawler\Crawler;
 
 
-
 class MyStep extends Step
 {
+    private ?string $baseUrl = null;
 
+    private ?string $noResultName = null;
+
+    private ?string $noResultUrl = null;
 
     protected function validateAndSanitizeInput(mixed $input): Crawler
     {
-        if ($input === null) {
-            throw new InvalidArgumentException('Input cannot be null.');
+        $this->noResultName = $input['subMenuName'];
+        $this->noResultUrl = $input['subMenuUrl'];
+
+        if ($input['subMenuUrlResponse'] instanceof RespondedRequest) {
+            $this->baseUrl = $input['subMenuUrlResponse']->effectiveUri();
         }
 
-        if ($input instanceof Crawler) {
-            return $input;
-        }
-
-        if (is_string($input) || $input instanceof Stringable) {
-            return new Crawler($input);
-        }
-
-        if ($input instanceof RespondedRequest) {
-            $response = $input->response;
-            return new Crawler((string)$response->getBody());
-        }
-
-        throw new InvalidArgumentException('Input must be string, stringable, or HTTP response (RespondedRequest).');
+        return $this->validateAndSanitizeToDomCrawlerInstance($input['subMenuUrlResponse']);
     }
 
     protected function invoke(mixed $input): Generator
     {
-        $crawler = $this->validateAndSanitizeInput($input);
+        /** @var Crawler $crawler */
+        $crawler = $input;
 
-        if ($crawler instanceof Crawler) {
+        // Extract the menu items and links
+        if ($crawler->filter('#categorymenu')->count() > 0) {
+            $menusData = $crawler->filter('#categorymenu .main')->each(function (Crawler $category) {
+                $link = $category->filter('a')->first()->link();
 
-            // Extract the menu items and links
-            if ($crawler->filter('#categorymenu')->count() > 0) {
-                $menuData = $crawler->filter('#categorymenu .main')->each(function (Crawler $category) {
-                    $link = $category->filter('a')->first()->link();
-                    return [
-                        'MenuDebth' => $category->filter('a')->first()->text(),
-                        'urlDebth' => $link->getUri(),
-                    ];
-                });
+                return [
+                    'subSubName' => $category->filter('a')->first()->text(),
+                    'subSubUrl' => $link->getUri(),
+                ];
+            });
 
-                    yield $menuData;
+            foreach ($menusData as $menuData) {
+                yield $menuData;
             }
 
-            // Extract the map-city-link
-             if ($crawler->filter('#svgmap')->count() > 0) {
-                 /*
-                $regionData = $crawler->filter('#svgmap [id^="title_"]')->each(function (Crawler $region) {
-                    //$link = $region->filter('a')->first()->link();
-                    return [
-                        'text' => $region->filter('title')->first()->text(),
-                    ];
-                });
-                    yield $regionData;
-            }
-                 */
-
-                 //Working Fine
-                 $regionData = $crawler->filter('.grid .grid-item')->each(function (Crawler $region) {
-
-                     return [
-                         'text' => $region->filter('a')->first()->text(),
-                     ];
-                 });
-                 yield $regionData;
-             }
-
-
-            else {
-                $url = $crawler->getUri();
-                yield (string)$url;
-            }
+            return;
         }
+
+        // Extract the map-city-link
+        if ($crawler->filter('#svgmap')->count() > 0) {
+            $regionsData = $crawler->filter('#svgmap #paths [region_id]')->each(function (Crawler $region) use ($crawler) {
+                $region_id = $region->attr('region_id');
+                $title = $region->text();
+
+                return [
+                    'subSubName' => $title,
+                    'subSubUrl' => $this->baseUrl . '?region_id=' . $region_id,
+                ];
+            });
+
+            foreach ($regionsData as $regionData) {
+                yield $regionData;
+            }
+
+            return;
+        }
+
+        yield [
+            'subSubName' => $this->noResultName,
+            'subSubUrl' => $this->noResultUrl,
+        ];
     }
 }

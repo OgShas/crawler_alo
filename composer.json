@@ -6,5 +6,8 @@
         "psr-4": {
             "Crawler\\": "src/"
         }
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^6.3"
     }
 }

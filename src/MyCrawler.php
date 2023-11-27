@@ -34,7 +34,7 @@ class MyCrawler extends HttpCrawler
         $loader
             ->setCache(
                 (new FileCache(__DIR__ . './../cache'))
-                    ->ttl(60)
+                    ->ttl(3600)
                     ->useCompression()
             )
             ->retryCachedErrorResponses()
