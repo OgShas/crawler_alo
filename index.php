@@ -22,7 +22,7 @@ include "src/MyStep.php";
                 'mainMenuName' => Dom::cssSelector('a')->first()->text(),
                 'mainMenuUrl' => Dom::cssSelector('a')->first()->link()
             ])
-            ->maxOutputs(3)
+           // ->maxOutputs(3)
     )
     //Step 2 - take menu/2 list item (depth/2)
     ->addStep(
@@ -30,7 +30,7 @@ include "src/MyStep.php";
             ->keepInputData()
             ->useInputKey('mainMenuUrl')
             ->outputKey('mainMenuUrlResponse')
-            ->maxOutputs(3)
+            //->maxOutputs(3)
     )
     //Step 3 - extract every item from menu (depth/2)
     ->addStep(
@@ -41,14 +41,14 @@ include "src/MyStep.php";
                 'subMenuName' => Dom::cssSelector('a')->first()->text(),
                 'subMenuUrl' => Dom::cssSelector('a')->first()->link(),
             ])
-           ->maxOutputs(3)
+           //->maxOutputs(3)
     )
     ->addStep(
         Http::get()
             ->keepInputData()
             ->useInputKey('subMenuUrl')
             ->outputKey('subMenuUrlResponse')
-            ->maxOutputs(3)
+            //->maxOutputs(3)
     )
     ->addStep(
         (new MyStep())
@@ -59,10 +59,10 @@ include "src/MyStep.php";
                 'subSubName',
 //                'subSubUrl',
             ])
-            ->maxOutputs(3)
+            //->maxOutputs(3)
     )
     ->addStep(
-        Http::get()
+        Http::get()->paginate('.paginator_wrapper', 3)
             ->useInputKey('subSubUrl')
     )
     ->addStep(
